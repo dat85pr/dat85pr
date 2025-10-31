@@ -19,7 +19,7 @@ jobs:
       - name: Generate SVG
         uses: cyprieng/github-breakout@v1.0.0
         with:
-          github_username: shimu-i
+          github_username: dat85pr
 
       - name: Move generated SVGs
         run: |
