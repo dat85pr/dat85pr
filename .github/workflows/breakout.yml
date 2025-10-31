@@ -1,4 +1,4 @@
-name: generate contributions graph
+name: generate breakout svg
 
 on:
   schedule:
@@ -6,29 +6,42 @@ on:
   workflow_dispatch:
 
 jobs:
-  generate-graph:
+  generate-svg:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    
+    timeout-minutes: 5
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
-      - name: Generate GitHub Contributions SVG
-        uses: jstrieb/github-stats@latest
         with:
-          username: datSpr  # Thay bằng username của bạn
-          
-      - name: Move generated SVG
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Generate SVG
+        uses: cyprieng/github-breakout@v1.0.0
+        with:
+          github_username: datSpr
+
+      - name: Move generated SVGs
         run: |
           mkdir -p images
-          mv *.svg images/ || true
-          
-      - name: Commit and push
+          mv output/light.svg images/breakout-light.svg
+          mv output/dark.svg images/breakout-dark.svg
+
+      - name: Transform to grid layout
+        run: |
+          # Biến đổi SVG để có layout dạng lưới
+          # (Cần custom script phức tạp hơn)
+          python transform_to_grid.py || echo "Transform failed, using original"
+
+      - name: Configure git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add images/
-          git commit -m "chore: update contributions graph" || exit 0
+
+      - name: Commit and push SVGs
+        run: |
+          git add images/breakout-light.svg images/breakout-dark.svg
+          git diff --staged --quiet || git commit -m "chore: update breakout SVGs"
           git push
