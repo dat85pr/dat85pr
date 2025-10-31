@@ -21,21 +21,21 @@ jobs:
         with:
           github_username: dat85pr
 
-      - name: Move generated SVGs
+      - name: Create images directory
+        run: mkdir -p images
+
+      - name: Move and Rename SVGs
         run: |
-          mkdir -p images
-          mv output/light.svg images/breakout-light.svg
-          mv output/dark.svg images/breakout-dark.svg
+          mv output/light.svg images/breakout-light-v2.svg
+          mv output/dark.svg images/breakout-dark-v2.svg
 
       - name: Replace ball with emoji
         run: |
-          sed -i 's/<circle cx="50" cy="50" r="10" fill="white"/<text x="45" y="50" font-size="20">🎃<\/text>/g' images/breakout-light.svg || true
-          sed -i 's/<circle cx="50" cy="50" r="10" fill="white"/<text x="45" y="50" font-size="20">🎃<\/text>/g' images/breakout-dark.svg || true
+          sed -i 's/<circle cx="50" cy="50" r="10" fill="white"/<text x="45" y="50" font-size="20">🎃<\/text>/g' images/breakout-light-v2.svg || true
+          sed -i 's/<circle cx="50" cy="50" r="10" fill="white"/<text x="45" y="50" font-size="20">🎃<\/text>/g' images/breakout-dark-v2.svg || true
       
       - name: Fix colors for both themes
         run: |
-          # --- Color Palettes ---
-          # Using Halloween colors for dark mode
           DARK_BG='#0d1117'
           DARK_L0='#161b22'
           DARK_L1='#631c03'
@@ -43,26 +43,23 @@ jobs:
           DARK_L3='#fa7a18'
           DARK_L4='#fddf68'
           
-          # Original colors from the generator action
           ORIGINAL_DARK_BG='#161b22'
-          ORIGINAL_EMPTY_SQUARE='#ebedf0' # This is the white/light-gray square for no contributions
+          ORIGINAL_EMPTY_SQUARE='#ebedf0'
           ORIGINAL_L1='#0e4429'
           ORIGINAL_L2='#006d32'
           ORIGINAL_L3='#26a641'
           ORIGINAL_L4='#39d353'
 
-          # --- Apply fixes ---
-          # 1. Fix Dark Theme SVG with Halloween colors
-          sed -i "s/${ORIGINAL_DARK_BG}/${DARK_BG}/g" images/breakout-dark.svg || true
-          sed -i "s/${ORIGINAL_EMPTY_SQUARE}/${DARK_L0}/g" images/breakout-dark.svg || true
-          sed -i "s/${ORIGINAL_L1}/${DARK_L1}/g" images/breakout-dark.svg || true
-          sed -i "s/${ORIGINAL_L2}/${DARK_L2}/g" images/breakout-dark.svg || true
-          sed -i "s/${ORIGINAL_L3}/${DARK_L3}/g" images/breakout-dark.svg || true
-          sed -i "s/${ORIGINAL_L4}/${DARK_L4}/g" images/breakout-dark.svg || true
+          # Fix Dark Theme SVG with Halloween colors
+          sed -i "s/${ORIGINAL_DARK_BG}/${DARK_BG}/g" images/breakout-dark-v2.svg || true
+          sed -i "s/${ORIGINAL_EMPTY_SQUARE}/${DARK_L0}/g" images/breakout-dark-v2.svg || true
+          sed -i "s/${ORIGINAL_L1}/${DARK_L1}/g" images/breakout-dark-v2.svg || true
+          sed -i "s/${ORIGINAL_L2}/${DARK_L2}/g" images/breakout-dark-v2.svg || true
+          sed -i "s/${ORIGINAL_L3}/${DARK_L3}/g" images/breakout-dark-v2.svg || true
+          sed -i "s/${ORIGINAL_L4}/${DARK_L4}/g" images/breakout-dark-v2.svg || true
           
-          # 2. Fix Light Theme SVG: Change the white empty squares to a dark color
-          # This prevents them from looking bad when displayed on a dark background.
-          sed -i "s/${ORIGINAL_EMPTY_SQUARE}/${DARK_BG}/g" images/breakout-light.svg || true
+          # Fix Light Theme SVG to not have white squares
+          sed -i "s/${ORIGINAL_EMPTY_SQUARE}/${DARK_BG}/g" images/breakout-light-v2.svg || true
 
       - name: Configure git
         run: |
@@ -71,6 +68,6 @@ jobs:
 
       - name: Commit and push SVGs
         run: |
-          git add images/breakout-light.svg images/breakout-dark.svg
-          git commit -m "chore: update breakout SVGs (color fix)" || echo "No changes to commit"
+          git add images/breakout-light-v2.svg images/breakout-dark-v2.svg
+          git commit -m "chore: update breakout SVGs v2" || echo "No changes to commit"
           git push
