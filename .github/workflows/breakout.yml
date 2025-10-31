@@ -1,4 +1,4 @@
-name: generate breakout svg
+name: Generate Game-Like Contribution Graph
 
 on:
   schedule:
@@ -6,42 +6,31 @@ on:
   workflow_dispatch:
 
 jobs:
-  generate-svg:
+  generate-graph:
     permissions:
       contents: write
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-
+    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        
+      - name: Generate Contribution Grid
+        uses: Platane/snk@v3
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Generate SVG
-        uses: cyprieng/github-breakout@v1.0.0
-        with:
-          github_username: datSpr
-
-      - name: Move generated SVGs
+          github_user_name: datSpr
+          outputs: |
+            images/game-grid.svg?color=green&animation=none
+          
+      - name: Add Game Elements to SVG
         run: |
-          mkdir -p images
-          mv output/light.svg images/breakout-light.svg
-          mv output/dark.svg images/breakout-dark.svg
-
-      - name: Transform to grid layout
-        run: |
-          # Biến đổi SVG để có layout dạng lưới
-          # (Cần custom script phức tạp hơn)
-          python transform_to_grid.py || echo "Transform failed, using original"
-
-      - name: Configure git
+          # Thêm ball, paddle vào contribution graph
+          python add_game_elements.py images/game-grid.svg
+          
+      - name: Commit and push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Commit and push SVGs
-        run: |
-          git add images/breakout-light.svg images/breakout-dark.svg
-          git diff --staged --quiet || git commit -m "chore: update breakout SVGs"
+          git add images/
+          git commit -m "chore: update game-style contribution graph" || exit 0
           git push
