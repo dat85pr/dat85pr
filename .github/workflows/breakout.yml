@@ -2,8 +2,8 @@ name: generate breakout svg
 
 on:
   schedule:
-    - cron: "0 */24 * * *"   # chạy mỗi ngày
-  workflow_dispatch:         # cho phép bấm chạy tay
+    - cron: "5 18 * * *"
+  workflow_dispatch:
 
 jobs:
   generate-svg:
@@ -16,16 +16,21 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: generate SVG
+      - name: Generate SVG
         uses: cyprieng/github-breakout@v1.0.0
         with:
-          github_username: ${{ github.repository_owner }}
+          github_username: shimu-i
 
       - name: Move generated SVGs
         run: |
           mkdir -p images
           mv output/light.svg images/breakout-light.svg
           mv output/dark.svg images/breakout-dark.svg
+
+      - name: Replace ball with emoji
+        run: |
+          sed -i 's/<circle cx="50" cy="50" r="10" fill="white"/<text x="45" y="50" font-size="20">😊<\/text>/g' images/breakout-light.svg || true
+          sed -i 's/<circle cx="50" cy="50" r="10" fill="white"/<text x="45" y="50" font-size="20">😊<\/text>/g' images/breakout-dark.svg || true
 
       - name: Configure git
         run: |
