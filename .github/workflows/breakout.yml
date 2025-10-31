@@ -32,31 +32,37 @@ jobs:
           sed -i 's/<circle cx="50" cy="50" r="10" fill="white"/<text x="45" y="50" font-size="20">🎃<\/text>/g' images/breakout-light.svg || true
           sed -i 's/<circle cx="50" cy="50" r="10" fill="white"/<text x="45" y="50" font-size="20">🎃<\/text>/g' images/breakout-dark.svg || true
       
-      - name: Apply Halloween Colors to Dark Theme
+      - name: Fix colors for both themes
         run: |
-          # Halloween Color Palette
-          HALLOWEEN_BG='#0d1117'      # Background
-          HALLOWEEN_L0='#161b22'      # Level 0 (no contribution)
-          HALLOWEEN_L1='#631c03'      # Level 1 (less)
-          HALLOWEEN_L2='#bd561d'      # Level 2
-          HALLOWEEN_L3='#fa7a18'      # Level 3
-          HALLOWEEN_L4='#fddf68'      # Level 4 (more)
-
-          # Original Dark Theme Colors from the action
-          ORIGINAL_BG='#161b22'
-          ORIGINAL_L0='#ebedf0' # This is used for empty squares
+          # --- Color Palettes ---
+          # Using Halloween colors for dark mode
+          DARK_BG='#0d1117'
+          DARK_L0='#161b22'
+          DARK_L1='#631c03'
+          DARK_L2='#bd561d'
+          DARK_L3='#fa7a18'
+          DARK_L4='#fddf68'
+          
+          # Original colors from the generator action
+          ORIGINAL_DARK_BG='#161b22'
+          ORIGINAL_EMPTY_SQUARE='#ebedf0' # This is the white/light-gray square for no contributions
           ORIGINAL_L1='#0e4429'
           ORIGINAL_L2='#006d32'
           ORIGINAL_L3='#26a641'
           ORIGINAL_L4='#39d353'
 
-          # Replace colors in the dark mode SVG
-          sed -i "s/${ORIGINAL_BG}/${HALLOWEEN_BG}/g" images/breakout-dark.svg || true
-          sed -i "s/${ORIGINAL_L0}/${HALLOWEEN_L0}/g" images/breakout-dark.svg || true
-          sed -i "s/${ORIGINAL_L1}/${HALLOWEEN_L1}/g" images/breakout-dark.svg || true
-          sed -i "s/${ORIGINAL_L2}/${HALLOWEEN_L2}/g" images/breakout-dark.svg || true
-          sed -i "s/${ORIGINAL_L3}/${HALLOWEEN_L3}/g" images/breakout-dark.svg || true
-          sed -i "s/${ORIGINAL_L4}/${HALLOWEEN_L4}/g" images/breakout-dark.svg || true
+          # --- Apply fixes ---
+          # 1. Fix Dark Theme SVG with Halloween colors
+          sed -i "s/${ORIGINAL_DARK_BG}/${DARK_BG}/g" images/breakout-dark.svg || true
+          sed -i "s/${ORIGINAL_EMPTY_SQUARE}/${DARK_L0}/g" images/breakout-dark.svg || true
+          sed -i "s/${ORIGINAL_L1}/${DARK_L1}/g" images/breakout-dark.svg || true
+          sed -i "s/${ORIGINAL_L2}/${DARK_L2}/g" images/breakout-dark.svg || true
+          sed -i "s/${ORIGINAL_L3}/${DARK_L3}/g" images/breakout-dark.svg || true
+          sed -i "s/${ORIGINAL_L4}/${DARK_L4}/g" images/breakout-dark.svg || true
+          
+          # 2. Fix Light Theme SVG: Change the white empty squares to a dark color
+          # This prevents them from looking bad when displayed on a dark background.
+          sed -i "s/${ORIGINAL_EMPTY_SQUARE}/${DARK_BG}/g" images/breakout-light.svg || true
 
       - name: Configure git
         run: |
@@ -66,5 +72,5 @@ jobs:
       - name: Commit and push SVGs
         run: |
           git add images/breakout-light.svg images/breakout-dark.svg
-          git commit -m "chore: update breakout SVGs (Halloween)" || echo "No changes to commit"
+          git commit -m "chore: update breakout SVGs (color fix)" || echo "No changes to commit"
           git push
