@@ -2,7 +2,7 @@ name: generate breakout svg
 
 on:
   schedule:
-    - cron: "0 */24 * * *"   # chạy mỗi ngày
+    - cron: "0 */24 * * *"   # chạy mỗi ngày 1 lần
   workflow_dispatch:         # cho phép bấm chạy tay
 
 jobs:
